@@ -9,7 +9,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 ############## Protobuf ################
 
 # ---- Protobuf (FFI protos) ----
-set(FFI_PROTO_DIR ${CMAKE_SOURCE_DIR}/client-sdk-rust/livekit-ffi/protocol)
+set(FFI_PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/client-sdk-rust/livekit-ffi/protocol)
 set(FFI_PROTO_FILES
     ${FFI_PROTO_DIR}/handle.proto
     ${FFI_PROTO_DIR}/ffi.proto
@@ -24,7 +24,7 @@ set(FFI_PROTO_FILES
     ${FFI_PROTO_DIR}/rpc.proto
     ${FFI_PROTO_DIR}/track_publication.proto
 )
-set(PROTO_BINARY_DIR ${CMAKE_BINARY_DIR}/generated)
+set(PROTO_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
 file(MAKE_DIRECTORY ${PROTO_BINARY_DIR})
 
 find_package(Protobuf REQUIRED)
@@ -55,10 +55,10 @@ file(MAKE_DIRECTORY "${GENERATED_INCLUDE_DIR}")
 # Try to capture git commit; fall back to "unknown" if git isn't available or repo isn't present.
 set(GIT_COMMIT "unknown")
 find_package(Git QUIET)
-if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+if(GIT_FOUND AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" rev-parse --short HEAD
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     OUTPUT_VARIABLE GIT_COMMIT
     OUTPUT_STRIP_TRAILING_WHITESPACE
     ERROR_QUIET
@@ -87,10 +87,10 @@ include_directories("${GENERATED_INCLUDE_DIR}")
 # Find cargo
 find_program(CARGO_EXECUTABLE NAMES cargo REQUIRED)
 
-set(RUST_ROOT ${CMAKE_SOURCE_DIR}/client-sdk-rust)
+set(RUST_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/client-sdk-rust)
 
 # Write a helper script that never passes empty args
-set(RUN_CARGO_SCRIPT ${CMAKE_BINARY_DIR}/run_cargo.cmake)
+set(RUN_CARGO_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/run_cargo.cmake)
 file(WRITE ${RUN_CARGO_SCRIPT}
 "if(NOT DEFINED CFG)
   set(CFG Debug)
@@ -218,8 +218,8 @@ add_library(livekit
 target_sources(livekit PRIVATE $<TARGET_OBJECTS:livekit_proto>)
 
 target_include_directories(livekit PUBLIC
-  ${CMAKE_SOURCE_DIR}/include
-  ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${RUST_ROOT}/livekit-ffi/include
   ${PROTO_BINARY_DIR}
   ${GENERATED_INCLUDE_DIR}
@@ -361,8 +361,8 @@ add_custom_target(cargo_clean
 # Note: 'clean' is CMake's built-in target that removes CMake-built artifacts.
 add_custom_target(clean_all
   # 1) CMake clean (object files, libs, exes)
-  COMMAND ${CMAKE_COMMAND} -E echo "==> CMake clean in: ${CMAKE_BINARY_DIR}"
-  COMMAND ${CMAKE_COMMAND} --build "${CMAKE_BINARY_DIR}" --target clean || true
+  COMMAND ${CMAKE_COMMAND} -E echo "==> CMake clean in: ${CMAKE_CURRENT_BINARY_DIR}"
+  COMMAND ${CMAKE_COMMAND} --build "${CMAKE_CURRENT_BINARY_DIR}" --target clean || true
   # 2) Cargo clean (Rust target/)
   COMMAND ${CMAKE_COMMAND} -E echo "==> cargo clean in: ${RUST_ROOT}"
   COMMAND ${CMAKE_COMMAND} -E chdir "${RUST_ROOT}" "${CARGO_EXECUTABLE}" clean || true
@@ -371,8 +371,8 @@ add_custom_target(clean_all
   COMMAND ${CMAKE_COMMAND} -E rm -rf "${PROTO_BINARY_DIR}" || true
   # 4) Remove the entire build directory (like `rm -rf build`)
   #    Switch to SOURCE dir first so removing BINARY dir is always safe.
-  COMMAND ${CMAKE_COMMAND} -E echo "==> removing build directory: ${CMAKE_BINARY_DIR}"
-  COMMAND ${CMAKE_COMMAND} -E chdir "${CMAKE_SOURCE_DIR}" ${CMAKE_COMMAND} -E rm -rf "${CMAKE_BINARY_DIR}" || true
+  COMMAND ${CMAKE_COMMAND} -E echo "==> removing build directory: ${CMAKE_CURRENT_BINARY_DIR}"
+  COMMAND ${CMAKE_COMMAND} -E chdir "${CMAKE_CURRENT_SOURCE_DIR}" ${CMAKE_COMMAND} -E rm -rf "${CMAKE_CURRENT_BINARY_DIR}" || true
   COMMENT "Full clean: CMake outputs + Rust target + generated protos + delete build/"
   VERBATIM
 )
