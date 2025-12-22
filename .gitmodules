@@ -1,3 +1,0 @@
-[submodule "Client-SDK-Rust"]
-	path = Client-SDK-Rust
-	url = https://github.com/Cithorum/Client-SDK-Rust.git

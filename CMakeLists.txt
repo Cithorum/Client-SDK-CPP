@@ -6,10 +6,20 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# ---- Build Rust dependencies before the C++ wrappers are compiled ----
+include(FetchContent)
+include(ExternalProject)
+FetchContent_Declare(
+  livekit_rust 
+  URL https://github.com/Cithorum/Client-SDK-Rust/archive/refs/heads/main.zip
+)
+FetchContent_MakeAvailable(livekit_rust)
+list(APPEND CMAKE_MODULE_PATH ${livekit_rust_SOURCE_DIR})
+
 ############## Protobuf ################
 
 # ---- Protobuf (FFI protos) ----
-set(FFI_PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Client-SDK-Rust/livekit-ffi/protocol)
+set(FFI_PROTO_DIR ${livekit_rust_SOURCE_DIR}/Client-SDK-Rust/livekit-ffi/protocol)
 set(FFI_PROTO_FILES
     ${FFI_PROTO_DIR}/handle.proto
     ${FFI_PROTO_DIR}/ffi.proto
@@ -87,7 +97,7 @@ include_directories("${GENERATED_INCLUDE_DIR}")
 # Find cargo
 find_program(CARGO_EXECUTABLE NAMES cargo REQUIRED)
 
-set(RUST_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Client-SDK-Rust)
+set(RUST_ROOT ${livekit_rust_SOURCE_DIR}/Client-SDK-Rust)
 
 # Write a helper script that never passes empty args
 set(RUN_CARGO_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/run_cargo.cmake)
