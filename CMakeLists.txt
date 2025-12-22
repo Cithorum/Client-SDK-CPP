@@ -19,7 +19,7 @@ list(APPEND CMAKE_MODULE_PATH ${livekit_rust_SOURCE_DIR})
 ############## Protobuf ################
 
 # ---- Protobuf (FFI protos) ----
-set(FFI_PROTO_DIR ${livekit_rust_SOURCE_DIR}/Client-SDK-Rust/livekit-ffi/protocol)
+set(FFI_PROTO_DIR ${livekit_rust_SOURCE_DIR}/livekit-ffi/protocol)
 set(FFI_PROTO_FILES
     ${FFI_PROTO_DIR}/handle.proto
     ${FFI_PROTO_DIR}/ffi.proto
@@ -97,7 +97,7 @@ include_directories("${GENERATED_INCLUDE_DIR}")
 # Find cargo
 find_program(CARGO_EXECUTABLE NAMES cargo REQUIRED)
 
-set(RUST_ROOT ${livekit_rust_SOURCE_DIR}/Client-SDK-Rust)
+set(RUST_ROOT ${livekit_rust_SOURCE_DIR})
 
 # Write a helper script that never passes empty args
 set(RUN_CARGO_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/run_cargo.cmake)
