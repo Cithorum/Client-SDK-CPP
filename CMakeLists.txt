@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 3.31.0)
+
+# Setup vcpkg script with CMake (note: should be placed before project() call)
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "Vcpkg toolchain file")
+
 project(livekit LANGUAGES C CXX)
 
 # ---- C++ standard ----
@@ -6,9 +10,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# ---- Build Rust dependencies before the C++ wrappers are compiled ----
 include(FetchContent)
 include(ExternalProject)
+
+# ---- Build Rust dependencies ----
 FetchContent_Declare(
   livekit_rust 
   URL https://github.com/Cithorum/Client-SDK-Rust/archive/refs/heads/main.zip
@@ -16,9 +21,9 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(livekit_rust)
 list(APPEND CMAKE_MODULE_PATH ${livekit_rust_SOURCE_DIR})
 
-############## Protobuf ################
+############## protobuf ################
 
-# ---- Protobuf (FFI protos) ----
+# ---- protobuf (FFI protos) ----
 set(FFI_PROTO_DIR ${livekit_rust_SOURCE_DIR}/livekit-ffi/protocol)
 set(FFI_PROTO_FILES
     ${FFI_PROTO_DIR}/handle.proto
@@ -37,14 +42,14 @@ set(FFI_PROTO_FILES
 set(PROTO_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated)
 file(MAKE_DIRECTORY ${PROTO_BINARY_DIR})
 
-find_package(Protobuf REQUIRED)
+find_package(protobuf REQUIRED)
 find_package(absl CONFIG REQUIRED)
 
 # Object library that owns generated .pb.cc/.pb.h
 add_library(livekit_proto OBJECT ${FFI_PROTO_FILES})
 target_include_directories(livekit_proto PRIVATE
   "$<BUILD_INTERFACE:${PROTO_BINARY_DIR}>"
-  ${Protobuf_INCLUDE_DIRS}
+  ${protobuf_INCLUDE_DIRS}
 )
 target_link_libraries(livekit_proto PRIVATE protobuf::libprotobuf)
 
@@ -241,7 +246,7 @@ target_link_libraries(livekit
     protobuf::libprotobuf
 )
 # Ensure protoc matches headers/libs
-message(STATUS "Protobuf: version=${Protobuf_VERSION}; protoc=${Protobuf_PROTOC_EXECUTABLE}")
+message(STATUS "protobuf: version=${protobuf_VERSION}; protoc=${protobuf_PROTOC_EXECUTABLE}")
 
 # Ensure cargo runs before we try to link livekit
 add_dependencies(livekit build_rust_ffi)
@@ -298,8 +303,8 @@ endif()
   target_link_options(livekit INTERFACE "LINKER:-ObjC")
 endif()
 
-# Only Protobuf >= 6 needs Abseil
-if (Protobuf_VERSION VERSION_GREATER_EQUAL 6.0)
+# Only protobuf >= 6 needs Abseil
+if (protobuf_VERSION VERSION_GREATER_EQUAL 6.0)
   # Try modern package name/namespace
   find_package(absl CONFIG QUIET)
   # Some distros export as "Abseil::"
@@ -323,12 +328,12 @@ if (Protobuf_VERSION VERSION_GREATER_EQUAL 6.0)
     )
   else()
     message(FATAL_ERROR
-      "Protobuf ${Protobuf_VERSION} requires Abseil but no CMake package was found.\n"
+      "protobuf ${protobuf_VERSION} requires Abseil but no CMake package was found.\n"
       "Install Abseil (macOS: 'brew install abseil', Ubuntu: 'sudo apt-get install libabsl-dev'), "
-      "or use Protobuf < 6.")
+      "or use protobuf < 6.")
   endif()
 else()
-  message(STATUS "Protobuf < 6 detected; skipping Abseil linking.")
+  message(STATUS "protobuf < 6 detected; skipping Abseil linking.")
 endif()
 
 # On Linux, it needs to link OpenSSL

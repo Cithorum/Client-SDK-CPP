@@ -1,4 +1,5 @@
 .cache/
+Build/
 CMakeFiles/
 CMakeCache.txt
 .DS_Store
@@ -7,3 +8,4 @@ cmake_install.cmake
 out
 build/
 received_green.avif
+vcpkg/

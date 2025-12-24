@@ -1,0 +1,30 @@
+{
+  "name": "livekit-client-sdk-cpp",
+  "version-string": "1.0.0",
+  "dependencies": [
+    {
+      "name": "abseil",
+      "version>=": "20250814.1#0"
+    },
+    {
+      "name": "protobuf",
+      "version>=": "5.29.5#3"
+    },
+    {
+      "name": "vcpkg-cmake",
+      "version>=": "2024-04-23#0",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "version>=": "2024-05-23#0",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-get-vars",
+      "version>=": "2024-09-22#0",
+      "host": true
+    }
+  ],
+  "builtin-baseline": "0cb95c860ea83aafc1b24350510b30dec535989a"
+}
