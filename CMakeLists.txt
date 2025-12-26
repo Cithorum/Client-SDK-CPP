@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.31.0)
 
+# Install vcpkg
+execute_process(
+  COMMAND git clone https://github.com/Microsoft/vcpkg.git
+  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+  COMMAND_ERROR_IS_FATAL ANY
+)
+
 # Setup vcpkg script with CMake (note: should be placed before project() call)
-set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "Vcpkg toolchain file")
+set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_LIST_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "Vcpkg toolchain file")
 
 project(livekit LANGUAGES C CXX)
 
