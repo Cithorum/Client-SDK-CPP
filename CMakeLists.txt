@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 3.31.0)
 execute_process(
   COMMAND git clone https://github.com/Microsoft/vcpkg.git
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-  COMMAND_ERROR_IS_FATAL ANY
 )
 
 # Setup vcpkg script with CMake (note: should be placed before project() call)
